@@ -1,0 +1,38 @@
+---
+import { supabase } from '../lib/supabase';
+
+// Consultamos las noticias publicadas
+const { data: posts } = await supabase
+  .from('editorial_drafts')
+  .select('*')
+  .eq('status', 'published')
+  .order('published_at', { ascending: false });
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<title>Taka Sport | Noticias Deportivas</title>
+		<meta name="viewport" content="width=device-width" />
+		<style>
+			body { font-family: system-ui; max-width: 800px; margin: 0 auto; padding: 20px; background: #f4f4f4; }
+			h1 { color: #d32f2f; text-align: center; border-bottom: 4px solid #d32f2f; padding-bottom: 10px; }
+			.card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+			.card h2 { margin-top: 0; color: #333; }
+			.card p { color: #666; line-height: 1.6; }
+			.btn { display: inline-block; background: #d32f2f; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+		</style>
+	</head>
+	<body>
+		<h1>TAKA SPORT</h1>
+		<main>
+			{posts?.map((post) => (
+				<article class="card">
+					<h2>{post.title}</h2>
+					<p>{post.seo_description}</p>
+					<a href={`/post/${post.slug}`} class="btn">Leer más</a>
+				</article>
+			))}
+		</main>
+	</body>
+</html>

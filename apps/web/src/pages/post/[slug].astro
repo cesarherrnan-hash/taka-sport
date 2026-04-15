@@ -1,0 +1,56 @@
+---
+export const prerender = false;
+import { supabase } from '../../lib/supabase';
+
+// 1. Obtenemos el "slug" de la URL
+const { slug } = Astro.params;
+
+// 2. Buscamos la noticia exacta en Supabase
+const { data: post, error } = await supabase
+  .from('editorial_drafts')
+  .select('*')
+  .eq('slug', slug)
+  .single();
+
+// Si no existe la noticia, mandamos a 404
+if (error || !post) {
+  return Astro.redirect('/404');
+}
+
+// Separamos el contenido que guardó Gemini (que viene con etiquetas TITULO:, CUERPO:, etc.)
+// Esto es para que no se vea el texto plano, sino con buen diseño.
+const contentRaw = post.content;
+const bodyText = contentRaw.split('CUERPO:')[1] || contentRaw;
+---
+
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>{post.title} | Taka Sport</title>
+    <meta name="viewport" content="width=device-width" />
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.8; color: #333; max-width: 800px; margin: 0 auto; padding: 40px 20px; background: #fff; }
+        .back-link { display: block; margin-bottom: 20px; color: #d32f2f; text-decoration: none; font-weight: bold; }
+        h1 { font-size: 2.5rem; line-height: 1.2; color: #111; margin-bottom: 10px; }
+        .bajada { font-size: 1.25rem; color: #666; font-style: italic; margin-bottom: 30px; border-left: 4px solid #d32f2f; padding-left: 15px; }
+        .content { font-size: 1.1rem; white-space: pre-line; } /* Mantiene los saltos de línea de la IA */
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; font-size: 0.9rem; color: #999; }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Volver a Taka Sport</a>
+    
+    <article>
+        <h1>{post.title}</h1>
+        <p class="bajada">{post.seo_description}</p>
+        
+        <div class="content">
+            {bodyText}
+        </div>
+    </article>
+
+    <footer>
+        Publicado el {new Date(post.published_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+    </footer>
+</body>
+</html>
