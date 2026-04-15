@@ -1,4 +1,6 @@
 ---
+export const prerender = false; // <--- LA MAGIA: Obliga a Vercel a cargar datos en vivo
+import Layout from '../layouts/Layout.astro';
 import { supabase } from '../lib/supabase';
 
 // Consultamos las noticias publicadas
@@ -9,30 +11,34 @@ const { data: posts } = await supabase
   .order('published_at', { ascending: false });
 ---
 
-<html lang="es">
-	<head>
-		<meta charset="utf-8" />
-		<title>Taka Sport | Noticias Deportivas</title>
-		<meta name="viewport" content="width=device-width" />
-		<style>
-			body { font-family: system-ui; max-width: 800px; margin: 0 auto; padding: 20px; background: #f4f4f4; }
-			h1 { color: #d32f2f; text-align: center; border-bottom: 4px solid #d32f2f; padding-bottom: 10px; }
-			.card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-			.card h2 { margin-top: 0; color: #333; }
-			.card p { color: #666; line-height: 1.6; }
-			.btn { display: inline-block; background: #d32f2f; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
-		</style>
-	</head>
-	<body>
-		<h1>TAKA SPORT</h1>
-		<main>
-			{posts?.map((post) => (
-				<article class="card">
-					<h2>{post.title}</h2>
-					<p>{post.seo_description}</p>
-					<a href={`/post/${post.slug}`} class="btn">Leer más</a>
-				</article>
-			))}
-		</main>
-	</body>
-</html>
+<Layout title="Taka Sport | Últimas Noticias Deportivas">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <div class="mb-10 border-l-4 border-red-600 pl-4">
+            <h1 class="text-4xl md:text-5xl font-black uppercase italic tracking-wide text-white">
+                Última <span class="text-red-600">Hora</span>
+            </h1>
+            <p class="text-gray-400 mt-2 text-lg">La actualidad deportiva mundial, filtrada y validada por nuestro panel.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {posts?.map((post) => (
+                <article class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-300 flex flex-col group hover:-translate-y-1">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h2 class="text-xl font-bold text-white mb-3 leading-tight group-hover:text-red-400 transition-colors">
+                            <a href={`/post/${post.slug}`}>
+                                {post.title}
+                            </a>
+                        </h2>
+                        <p class="text-gray-400 text-sm mb-6 flex-grow line-clamp-3">
+                            {post.seo_description}
+                        </p>
+                        
+                        <a href={`/post/${post.slug}`} class="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded transition-colors text-center uppercase tracking-wider text-sm mt-auto">
+                            Leer cobertura completa
+                        </a>
+                    </div>
+                </article>
+            ))}
+        </div>
+    </div>
+</Layout>
