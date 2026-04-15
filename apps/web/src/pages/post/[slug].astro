@@ -17,9 +17,33 @@ if (error || !post) {
 
 const contentRaw = post.content;
 const bodyText = contentRaw.split('CUERPO:')[1] || contentRaw;
+
+// Construimos la URL completa para el SEO
+const articleUrl = `https://taka-sport-web.vercel.app/post/${post.slug}`;
+
+// Schema.org estructurado para Google News / Discover
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": post.title,
+  "description": post.seo_description,
+  "datePublished": post.published_at,
+  "author": [{
+      "@type": "Organization",
+      "name": "Taka Sport",
+      "url": "https://taka-sport-web.vercel.app/"
+  }]
+};
 ---
 
-<Layout title={`${post.title} | Taka Sport`}>
+<Layout 
+	title={`${post.title} | Taka Sport`}
+	description={post.seo_description}
+	type="article"
+	url={articleUrl}
+>
+	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
 	<style>
 		.article-container { max-width: 800px; margin: 0 auto; }
 		.back-link { display: inline-block; color: var(--accent-red); font-weight: bold; text-transform: uppercase; font-size: 0.875rem; margin-bottom: 2rem; transition: color 0.2s; }
