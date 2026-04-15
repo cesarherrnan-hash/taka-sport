@@ -1,0 +1,129 @@
+---
+import { supabase } from '../lib/supabase';
+
+// Consultamos los próximos eventos en la base de datos
+const { data: events } = await supabase
+  .from('calendar_events')
+  .select('*')
+  .order('match_time', { ascending: true })
+  .limit(5);
+---
+
+<div class="upcoming-widget">
+    <div class="widget-header">
+        <h3 class="widget-title"><span class="accent-line"></span> PRÓXIMOS</h3>
+        <a href="/calendario" class="view-all">Ver todos →</a>
+    </div>
+
+    <div class="events-list">
+        {events && events.length > 0 ? (
+            events.map((event) => (
+                <div class="event-item" style={`border-left-color: ${event.color};`}>
+                    <div class="event-info">
+                        <p class="event-title">{event.title}</p>
+                        <span class="event-sport" style={`color: ${event.color};`}>{event.sport}</span>
+                    </div>
+                    <div class="event-time">
+                        {event.display_time}
+                    </div>
+                </div>
+            ))
+        ) : (
+            <p class="empty-state">No hay eventos programados.</p>
+        )}
+    </div>
+</div>
+
+<style>
+    .upcoming-widget {
+        background: transparent;
+        width: 100%;
+    }
+
+    .widget-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .widget-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: white;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .accent-line {
+        width: 4px;
+        height: 16px;
+        background: var(--accent-red);
+        border-radius: 2px;
+    }
+
+    .view-all {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .view-all:hover { color: white; }
+
+    .events-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .event-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 1rem;
+        border-left: 3px solid #374151; /* Se sobrescribe en línea con el color del deporte */
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+    .event-item:hover {
+        transform: translateX(4px);
+    }
+
+    .event-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .event-title {
+        color: white;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .event-sport {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .event-time {
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .empty-state {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 1rem 0;
+    }
+</style>

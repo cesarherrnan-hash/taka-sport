@@ -1,12 +1,6 @@
 ---
-interface ReelData {
-  link: string;
-  image: string;
-  title: string;
-}
-
 interface Props {
-  reels: ReelData[];
+  reels: any[];
 }
 
 const { reels } = Astro.props;
@@ -14,14 +8,14 @@ const { reels } = Astro.props;
 
 <div class="reels-carousel">
     {reels.map(reel => (
-        <a href={reel.link} target="_blank" class="reel-card" title={`Ver: ${reel.title}`}>
-            <div class="reel-thumb" style={`background-image: url('${reel.image}')`}>
+        <a href={reel.post_url} target="_blank" class="reel-card">
+            <div class="reel-thumb" style={`background-image: url('${reel.thumbnail_url}')`}>
                 <div class="play-overlay">
-                    <svg viewBox="0 0 24 24" fill="white" width="60" height="60"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="white" width="48" height="48"><path d="M8 5.14v14l11-7-11-7z"/></svg>
                 </div>
             </div>
             <div class="reel-info">
-                <span>{reel.title}</span>
+                <span>{reel.title || 'Ver Reel'}</span>
             </div>
         </a>
     ))}
@@ -40,20 +34,18 @@ const { reels } = Astro.props;
     .reels-carousel::-webkit-scrollbar-thumb { background: var(--accent-red); border-radius: 10px; }
 
     .reel-card {
-        flex: 0 0 260px; /* Ancho de cada miniatura */
+        flex: 0 0 240px;
         background: var(--bg-card);
         border-radius: 12px;
         overflow: hidden;
         border: 1px solid #374151;
-        transition: transform 0.3s, border-color 0.3s;
+        transition: transform 0.3s;
         text-decoration: none;
-        display: flex;
-        flex-direction: column;
     }
     .reel-card:hover { transform: translateY(-5px); border-color: var(--accent-red); }
 
     .reel-thumb {
-        height: 400px; /* Alto de la miniatura (formato vertical de Reel) */
+        height: 350px;
         background-size: cover;
         background-position: center;
         position: relative;
@@ -61,7 +53,7 @@ const { reels } = Astro.props;
     .play-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(0,0,0,0.4);
+        background: rgba(0,0,0,0.3);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -71,14 +63,13 @@ const { reels } = Astro.props;
     .reel-card:hover .play-overlay { opacity: 1; }
 
     .reel-info {
-        padding: 12px 16px;
+        padding: 12px;
         background: #000;
         color: white;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: bold;
         text-transform: uppercase;
         text-align: center;
-        border-top: 2px solid var(--accent-red);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
