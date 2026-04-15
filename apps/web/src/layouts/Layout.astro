@@ -12,6 +12,8 @@ const { title } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+        
+        <script src="https://cdn.tailwindcss.com"></script>
 	</head>
 	<body class="min-h-screen flex flex-col font-sans selection:bg-red-600 selection:text-white">
         <header class="bg-black border-b-2 border-red-600 p-4 sticky top-0 z-10 shadow-lg">
@@ -32,9 +34,3 @@ const { title } = Astro.props;
         </footer>
 	</body>
 </html>
-
-<style is:global>
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-</style>
