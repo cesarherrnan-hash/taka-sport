@@ -1,5 +1,5 @@
 ---
-export const prerender = false; // <--- LA MAGIA: Obliga a Vercel a cargar datos en vivo
+export const prerender = false;
 import Layout from '../layouts/Layout.astro';
 import { supabase } from '../lib/supabase';
 
@@ -12,33 +12,47 @@ const { data: posts } = await supabase
 ---
 
 <Layout title="Taka Sport | Últimas Noticias Deportivas">
-    <div class="max-w-6xl mx-auto px-4 py-8">
-        <div class="mb-10 border-l-4 border-red-600 pl-4">
-            <h1 class="text-4xl md:text-5xl font-black uppercase italic tracking-wide text-white">
-                Última <span class="text-red-600">Hora</span>
-            </h1>
-            <p class="text-gray-400 mt-2 text-lg">La actualidad deportiva mundial, filtrada y validada por nuestro panel.</p>
-        </div>
+	<style>
+		.header-section { margin-bottom: 2.5rem; border-left: 4px solid var(--accent-red); padding-left: 1rem; }
+		.main-title { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; font-style: italic; letter-spacing: 0.025em; }
+		.subtitle { color: var(--text-muted); font-size: 1.125rem; margin-top: 0.5rem; }
+		
+		.news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
+		.card {
+			background-color: var(--bg-card);
+			border-radius: 0.75rem;
+			border: 1px solid #374151;
+			padding: 1.5rem;
+			display: flex;
+			flex-direction: column;
+			transition: transform 0.2s, border-color 0.2s;
+		}
+		.card:hover { transform: translateY(-4px); border-color: var(--accent-red); }
+		.card-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem; line-height: 1.3; }
+		.card-title:hover { color: #fca5a5; }
+		.card-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; flex-grow: 1; }
+		.btn-read {
+			display: block; width: 100%; background-color: var(--accent-red); color: white;
+			text-align: center; padding: 0.75rem; border-radius: 0.25rem; font-weight: bold;
+			text-transform: uppercase; font-size: 0.875rem; transition: background-color 0.2s;
+		}
+		.btn-read:hover { background-color: var(--accent-hover); }
+	</style>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts?.map((post) => (
-                <article class="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-300 flex flex-col group hover:-translate-y-1">
-                    <div class="p-6 flex flex-col flex-grow">
-                        <h2 class="text-xl font-bold text-white mb-3 leading-tight group-hover:text-red-400 transition-colors">
-                            <a href={`/post/${post.slug}`}>
-                                {post.title}
-                            </a>
-                        </h2>
-                        <p class="text-gray-400 text-sm mb-6 flex-grow line-clamp-3">
-                            {post.seo_description}
-                        </p>
-                        
-                        <a href={`/post/${post.slug}`} class="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded transition-colors text-center uppercase tracking-wider text-sm mt-auto">
-                            Leer cobertura completa
-                        </a>
-                    </div>
-                </article>
-            ))}
-        </div>
-    </div>
+	<div class="header-section">
+		<h1 class="main-title">Última <span class="logo-red">Hora</span></h1>
+		<p class="subtitle">La actualidad deportiva mundial, filtrada y validada por nuestro panel.</p>
+	</div>
+
+	<div class="news-grid">
+		{posts?.map((post) => (
+			<article class="card">
+				<h2 class="card-title">
+					<a href={`/post/${post.slug}`}>{post.title}</a>
+				</h2>
+				<p class="card-desc">{post.seo_description}</p>
+				<a href={`/post/${post.slug}`} class="btn-read">Leer cobertura completa</a>
+			</article>
+		))}
+	</div>
 </Layout>

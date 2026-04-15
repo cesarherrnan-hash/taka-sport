@@ -5,32 +5,76 @@ interface Props {
 const { title } = Astro.props;
 ---
 <!doctype html>
-<html lang="es" class="bg-gray-900 text-gray-100">
+<html lang="es">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
-        
-        <script src="https://cdn.tailwindcss.com"></script>
+		<style is:global>
+			/* COLORES Y VARIABLES GLOBALES */
+			:root {
+				--bg-dark: #111827;
+				--bg-card: #1f2937;
+				--text-main: #f3f4f6;
+				--text-muted: #9ca3af;
+				--accent-red: #dc2626;
+				--accent-hover: #ef4444;
+			}
+			* { box-sizing: border-box; margin: 0; padding: 0; }
+			body {
+				font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				background-color: var(--bg-dark);
+				color: var(--text-main);
+				line-height: 1.5;
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+			}
+			a { text-decoration: none; color: inherit; }
+			
+			/* CABECERA (HEADER) */
+			header {
+				background-color: #000;
+				border-bottom: 2px solid var(--accent-red);
+				padding: 1rem;
+				position: sticky;
+				top: 0;
+				z-index: 10;
+			}
+			.logo { font-size: 1.875rem; font-weight: 900; font-style: italic; letter-spacing: -0.05em; }
+			.logo-red { color: var(--accent-red); }
+			
+			/* CUERPO (MAIN) */
+			main { flex-grow: 1; width: 100%; max-width: 1152px; margin: 0 auto; padding: 2rem 1rem; }
+			
+			/* PIE DE PÁGINA (FOOTER) */
+			footer {
+				background-color: #000;
+				color: var(--text-muted);
+				text-align: center;
+				padding: 2rem;
+				margin-top: 3rem;
+				border-top: 1px solid #374151;
+			}
+			.footer-brand { font-weight: bold; font-size: 1.125rem; margin-bottom: 0.5rem; font-style: italic; }
+		</style>
 	</head>
-	<body class="min-h-screen flex flex-col font-sans selection:bg-red-600 selection:text-white">
-        <header class="bg-black border-b-2 border-red-600 p-4 sticky top-0 z-10 shadow-lg">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <a href="/" class="text-3xl font-black italic tracking-tighter text-white">
-                    TAKA<span class="text-red-600">SPORT</span>
-                </a>
-            </div>
-        </header>
+	<body>
+		<header>
+			<div style="max-width: 1152px; margin: 0 auto;">
+				<a href="/" class="logo">TAKA<span class="logo-red">SPORT</span></a>
+			</div>
+		</header>
 
-        <main class="flex-grow">
+		<main>
 			<slot />
 		</main>
 
-        <footer class="bg-black text-gray-500 text-center p-8 border-t border-gray-800 mt-12">
-            <p class="font-bold text-lg mb-2 italic">Taka Sport</p>
-            <p class="text-sm">&copy; {new Date().getFullYear()} Medio Deportivo Internacional. Todos los derechos reservados.</p>
-        </footer>
+		<footer>
+			<p class="footer-brand">Taka Sport</p>
+			<p style="font-size: 0.875rem;">&copy; {new Date().getFullYear()} Medio Deportivo Internacional. Todos los derechos reservados.</p>
+		</footer>
 	</body>
 </html>

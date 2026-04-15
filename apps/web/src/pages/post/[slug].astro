@@ -3,48 +3,60 @@ export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import { supabase } from '../../lib/supabase';
 
-// 1. Obtenemos el "slug" de la URL
 const { slug } = Astro.params;
 
-// 2. Buscamos la noticia exacta en Supabase
 const { data: post, error } = await supabase
   .from('editorial_drafts')
   .select('*')
   .eq('slug', slug)
   .single();
 
-// Si no existe la noticia, mandamos a 404
 if (error || !post) {
   return Astro.redirect('/404');
 }
 
-// Separamos el contenido que guardó Gemini
 const contentRaw = post.content;
 const bodyText = contentRaw.split('CUERPO:')[1] || contentRaw;
 ---
 
 <Layout title={`${post.title} | Taka Sport`}>
-    <article class="max-w-4xl mx-auto px-4 py-8 md:py-12">
-        <a href="/" class="inline-flex items-center text-red-500 hover:text-red-400 font-bold mb-8 transition-colors group uppercase tracking-wider text-sm">
-            <span class="mr-2 group-hover:-translate-x-1 transition-transform">←</span> Volver a la Portada
-        </a>
-        
-        <header class="mb-12">
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
-                {post.title}
-            </h1>
-            <p class="text-xl md:text-2xl text-gray-400 italic border-l-4 border-red-600 pl-6 py-2">
-                {post.seo_description}
-            </p>
-        </header>
-        
-        <div class="text-lg md:text-xl text-gray-300 leading-relaxed whitespace-pre-line space-y-6">
-            {bodyText}
-        </div>
+	<style>
+		.article-container { max-width: 800px; margin: 0 auto; }
+		.back-link { display: inline-block; color: var(--accent-red); font-weight: bold; text-transform: uppercase; font-size: 0.875rem; margin-bottom: 2rem; transition: color 0.2s; }
+		.back-link:hover { color: var(--accent-hover); }
+		
+		.article-header { margin-bottom: 3rem; }
+		.article-title { font-size: 2.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem; }
+		.article-bajada { font-size: 1.25rem; color: var(--text-muted); font-style: italic; border-left: 4px solid var(--accent-red); padding-left: 1rem; }
+		
+		.article-body { font-size: 1.125rem; color: #d1d5db; line-height: 1.8; white-space: pre-line; }
+		
+		.article-footer {
+			margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #374151;
+			display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.875rem;
+		}
+		.brand-tag { text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em; color: #6b7280; }
+		
+		@media (min-width: 768px) {
+			.article-title { font-size: 3.5rem; }
+		}
+	</style>
 
-        <footer class="mt-16 pt-8 border-t border-gray-800 flex justify-between items-center text-gray-500 text-sm">
-            <span>Publicado el {new Date(post.published_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-            <span class="uppercase tracking-widest font-bold text-gray-700">Taka Sport</span>
-        </footer>
-    </article>
+	<article class="article-container">
+		<a href="/" class="back-link">← Volver a la Portada</a>
+		
+		<header class="article-header">
+			<h1 class="article-title">{post.title}</h1>
+			<p class="article-bajada">{post.seo_description}</p>
+		</header>
+		
+		<div class="article-body">
+			{bodyText}
+		</div>
+
+		<footer class="article-footer">
+			<span>Publicado el {new Date(post.published_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+			<span class="brand-tag">Taka Sport</span>
+		</footer>
+	</article>
 </Layout>
