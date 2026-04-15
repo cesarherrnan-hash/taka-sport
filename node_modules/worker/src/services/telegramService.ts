@@ -28,7 +28,6 @@ bot.action(/approve_(.+)/, async (ctx) => {
 
     try {
         // 1. Obtener los artículos del clúster
-        // Ajustamos la consulta para que sea más clara
         const { data: relations, error: dbError } = await supabase
             .from('cluster_articles')
             .select('raw_articles (title, summary)')
@@ -61,7 +60,7 @@ bot.action(/approve_(.+)/, async (ctx) => {
         });
 
     } catch (e: any) {
-        console.error("❌ ERROR CRÍTICO EN REDACCIÓN:", e); // Esto nos dirá el error real en la terminal
+        console.error("❌ ERROR CRÍTICO EN REDACCIÓN:", e); 
         await ctx.reply("❌ Error al redactar: El modelo de IA no respondió correctamente.");
     }
 });
@@ -70,7 +69,6 @@ bot.action(/approve_(.+)/, async (ctx) => {
 bot.action(/publish_(.+)/, async (ctx) => {
     const clusterId = ctx.match[1];
     
-    // Obtenemos el texto que está justo arriba del botón en el mensaje de Telegram
     const fullText = ctx.callbackQuery.message && 'text' in ctx.callbackQuery.message 
         ? ctx.callbackQuery.message.text 
         : "";
@@ -78,13 +76,16 @@ bot.action(/publish_(.+)/, async (ctx) => {
     await ctx.answerCbQuery("Publicando...");
     
     try {
-        // Extraemos Título, Bajada y Cuerpo del texto de la IA
-        // Buscamos las palabras clave que puso Gemini
+        // EXTRAEMOS LOS DATOS BASADOS EN EL NUEVO PROMPT ESTRICTO DE LA IA
+        const categoryLine = fullText.split('\n').find(l => l.includes('CATEGORIA:')) || "";
+        const category = categoryLine.replace('CATEGORIA:', '').trim() || 'Polideportivo'; // Valor por defecto si falla
+
         const titleLine = fullText.split('\n').find(l => l.includes('TITULO:')) || "";
         const title = titleLine.replace('TITULO:', '').trim();
         
-        const bajadaLine = fullText.split('\n').find(l => l.includes('BAJADA:')) || "";
-        const bajada = bajadaLine.replace('BAJADA:', '').trim();
+        // Manejamos la compatibilidad por si Gemini usa SEO_DESCRIPTION o BAJADA
+        const bajadaLine = fullText.split('\n').find(l => l.includes('SEO_DESCRIPTION:') || l.includes('BAJADA:')) || "";
+        const bajada = bajadaLine.replace(/SEO_DESCRIPTION:|BAJADA:/, '').trim();
 
         // Creamos un slug (URL amigable)
         const slug = title
@@ -98,8 +99,9 @@ bot.action(/publish_(.+)/, async (ctx) => {
             .insert([{
                 cluster_id: clusterId,
                 title: title,
+                category: category, // <--- LA NUEVA CATEGORIA SE GUARDA AQUI
                 slug: slug,
-                content: fullText, // Guardamos todo el borrador
+                content: fullText, 
                 seo_description: bajada,
                 status: 'published',
                 published_at: new Date().toISOString()
@@ -107,11 +109,12 @@ bot.action(/publish_(.+)/, async (ctx) => {
 
         if (error) throw error;
 
-        await ctx.editMessageText(`✅ ¡PUBLICADO EXITOSAMENTE!\n\nLa noticia "${title}" ya está en la base de datos de la web.`);
+        await ctx.editMessageText(`✅ ¡PUBLICADO EXITOSAMENTE!\n\nCategoría: ${category}\nLa noticia "${title}" ya está en la base de datos de la web.`);
 
     } catch (e: any) {
         console.error("Error al publicar:", e);
         await ctx.reply(`❌ Error al publicar: ${e.message}`);
     }
 });
+
 bot.launch().then(() => console.log("🤖 Bot de Taka Sport Activo y Escuchando..."));

@@ -1,58 +1,96 @@
 ---
 export const prerender = false;
 import Layout from '../layouts/Layout.astro';
+import InstagramReel from '../components/InstagramReel.astro';
 import { supabase } from '../lib/supabase';
 
-// Consultamos las noticias publicadas
-const { data: posts } = await supabase
+const tag = Astro.url.searchParams.get('tag');
+
+let query = supabase
   .from('editorial_drafts')
   .select('*')
   .eq('status', 'published')
   .order('published_at', { ascending: false });
+
+if (tag) {
+    query = query.eq('category', tag);
+}
+
+const { data: posts } = await query;
 ---
 
-<Layout title="Taka Sport | Últimas Noticias Deportivas">
+<Layout title={tag ? `Taka Sport | Noticias de ${tag}` : "Taka Sport | Últimas Noticias Deportivas"}>
 	<style>
 		.header-section { margin-bottom: 2.5rem; border-left: 4px solid var(--accent-red); padding-left: 1rem; }
 		.main-title { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; font-style: italic; letter-spacing: 0.025em; }
 		.subtitle { color: var(--text-muted); font-size: 1.125rem; margin-top: 0.5rem; }
+		.category-badge { display: inline-block; background-color: var(--accent-red); color: white; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; border-radius: 0.25rem; margin-bottom: 0.75rem; }
 		
-		.news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
-		.card {
-			background-color: var(--bg-card);
-			border-radius: 0.75rem;
-			border: 1px solid #374151;
-			padding: 1.5rem;
-			display: flex;
-			flex-direction: column;
-			transition: transform 0.2s, border-color 0.2s;
-		}
+        .portal-layout { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 2rem; 
+        }
+        @media (min-width: 1024px) {
+            .portal-layout { 
+                grid-template-columns: 1fr 350px; 
+                align-items: start; 
+            }
+            .sidebar { position: sticky; top: 100px; }
+        }
+
+		.news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+		.card { background-color: var(--bg-card); border-radius: 0.75rem; border: 1px solid #374151; padding: 1.5rem; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; }
 		.card:hover { transform: translateY(-4px); border-color: var(--accent-red); }
 		.card-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem; line-height: 1.3; }
 		.card-title:hover { color: #fca5a5; }
 		.card-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; flex-grow: 1; }
-		.btn-read {
-			display: block; width: 100%; background-color: var(--accent-red); color: white;
-			text-align: center; padding: 0.75rem; border-radius: 0.25rem; font-weight: bold;
-			text-transform: uppercase; font-size: 0.875rem; transition: background-color 0.2s;
-		}
+		.btn-read { display: block; width: 100%; background-color: var(--accent-red); color: white; text-align: center; padding: 0.75rem; border-radius: 0.25rem; font-weight: bold; text-transform: uppercase; font-size: 0.875rem; transition: background-color 0.2s; }
 		.btn-read:hover { background-color: var(--accent-hover); }
+        .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-muted); font-size: 1.25rem; }
+
+        .sidebar-title { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; font-style: italic; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid #374151; color: white;}
 	</style>
 
 	<div class="header-section">
-		<h1 class="main-title">Última <span class="logo-red">Hora</span></h1>
-		<p class="subtitle">La actualidad deportiva mundial, filtrada y validada por nuestro panel.</p>
+		<h1 class="main-title">
+            {tag ? tag : 'Última '} <span class="logo-red">{tag ? '' : 'Hora'}</span>
+        </h1>
+		<p class="subtitle">
+            {tag ? `Las noticias más recientes del mundo del ${tag}.` : 'La actualidad deportiva mundial, filtrada y validada por nuestro panel.'}
+        </p>
 	</div>
 
-	<div class="news-grid">
-		{posts?.map((post) => (
-			<article class="card">
-				<h2 class="card-title">
-					<a href={`/post/${post.slug}`}>{post.title}</a>
-				</h2>
-				<p class="card-desc">{post.seo_description}</p>
-				<a href={`/post/${post.slug}`} class="btn-read">Leer cobertura completa</a>
-			</article>
-		))}
-	</div>
+    <div class="portal-layout">
+        <div class="main-content">
+            <div class="news-grid">
+                {posts && posts.length > 0 ? (
+                    posts.map((post) => (
+                        <article class="card">
+                            {post.category && <span class="category-badge">{post.category}</span>}
+                            <h2 class="card-title">
+                                <a href={`/post/${post.slug}`}>{post.title}</a>
+                            </h2>
+                            <p class="card-desc">{post.seo_description}</p>
+                            <a href={`/post/${post.slug}`} class="btn-read">Leer cobertura completa</a>
+                        </article>
+                    ))
+                ) : (
+                    <div class="empty-state">
+                        <p>Aún no hay noticias publicadas en esta categoría.</p>
+                    </div>
+                )}
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Reel <span class="logo-red">Destacado</span></h3>
+            
+            <InstagramReel url="https://www.instagram.com/reel/C8qLd7bN_Y3/" />
+            
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-muted); font-size: 0.875rem;">
+                Síguenos en Instagram para contenido exclusivo.
+            </p>
+        </aside>
+    </div>
 </Layout>

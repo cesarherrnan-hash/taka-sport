@@ -10,7 +10,7 @@ interface Props {
 const { 
 	title, 
 	description = "La actualidad deportiva mundial, filtrada y validada por nuestro panel de expertos.",
-	image = "https://taka-sport-web.vercel.app/default-social.jpg", // Imagen por defecto para portada
+	image = "https://taka-sport-web.vercel.app/default-social.jpg",
 	type = "website",
 	url = "https://taka-sport-web.vercel.app/"
 } = Astro.props;
@@ -39,7 +39,6 @@ const {
 		<meta name="twitter:image" content={image} />
 
 		<style is:global>
-			/* COLORES Y VARIABLES GLOBALES */
 			:root {
 				--bg-dark: #111827;
 				--bg-card: #1f2937;
@@ -60,7 +59,6 @@ const {
 			}
 			a { text-decoration: none; color: inherit; }
 			
-			/* CABECERA (HEADER) */
 			header {
 				background-color: #000;
 				border-bottom: 2px solid var(--accent-red);
@@ -69,13 +67,29 @@ const {
 				top: 0;
 				z-index: 10;
 			}
-			.logo { font-size: 1.875rem; font-weight: 900; font-style: italic; letter-spacing: -0.05em; }
+			.logo { font-size: 1.875rem; font-weight: 900; font-style: italic; letter-spacing: -0.05em; display: inline-block; }
 			.logo-red { color: var(--accent-red); }
+            
+            /* ESTILOS NUEVOS: BARRA DE NAVEGACIÓN */
+            .top-bar { display: flex; flex-direction: column; gap: 1rem; }
+            @media (min-width: 768px) {
+                .top-bar { flex-direction: row; justify-content: space-between; align-items: center; }
+            }
+            .nav-menu { display: flex; gap: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: none; }
+            .nav-menu::-webkit-scrollbar { display: none; }
+            .nav-item {
+                color: var(--text-muted);
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 0.85rem;
+                letter-spacing: 0.05em;
+                white-space: nowrap;
+                transition: color 0.2s;
+            }
+            .nav-item:hover { color: var(--accent-red); }
 			
-			/* CUERPO (MAIN) */
 			main { flex-grow: 1; width: 100%; max-width: 1152px; margin: 0 auto; padding: 2rem 1rem; }
 			
-			/* PIE DE PÁGINA (FOOTER) */
 			footer {
 				background-color: #000;
 				color: var(--text-muted);
@@ -89,8 +103,17 @@ const {
 	</head>
 	<body>
 		<header>
-			<div style="max-width: 1152px; margin: 0 auto;">
+			<div style="max-width: 1152px; margin: 0 auto;" class="top-bar">
 				<a href="/" class="logo">TAKA<span class="logo-red">SPORT</span></a>
+                
+                <nav class="nav-menu">
+                    <a href="/?tag=Fútbol" class="nav-item">Fútbol</a>
+                    <a href="/?tag=Tenis" class="nav-item">Tenis</a>
+                    <a href="/?tag=Baloncesto" class="nav-item">Baloncesto</a>
+                    <a href="/?tag=F1" class="nav-item">F1</a>
+                    <a href="/?tag=MotoGP" class="nav-item">MotoGP</a>
+                    <a href="/?tag=Polideportivo" class="nav-item">Más Deportes</a>
+                </nav>
 			</div>
 		</header>
 

@@ -1,0 +1,59 @@
+---
+interface Props {
+  url: string;
+}
+
+const { url } = Astro.props;
+
+// Extraemos el código único con precisión quirúrgica
+const match = url.match(/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/);
+const shortcode = match ? match[1] : '';
+
+// Usamos el endpoint embed puro, sin variables raras
+const embedUrl = shortcode ? `https://www.instagram.com/p/${shortcode}/embed` : '';
+---
+
+<div class="reel-wrapper">
+    {embedUrl ? (
+        <iframe 
+            src={embedUrl}
+            class="ig-iframe"
+            frameborder="0" 
+            scrolling="no" 
+            allowtransparency="true"
+            allow="encrypted-media"
+            title="Instagram Video"
+        ></iframe>
+    ) : (
+        <div class="error-msg">
+            Enlace de Instagram no reconocido.
+        </div>
+    )}
+</div>
+
+<style>
+    .reel-wrapper {
+        width: 100%;
+        background-color: white; /* Instagram exige fondo blanco */
+        border-radius: 0.75rem;
+        overflow: hidden;
+        border: 1px solid #374151;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .ig-iframe {
+        width: 100%;
+        /* Altura fija suficiente para evitar recortes */
+        height: 650px; 
+        border: none;
+        display: block;
+    }
+
+    .error-msg {
+        color: #dc2626;
+        padding: 3rem 1rem;
+        text-align: center;
+        font-weight: bold;
+        background-color: var(--bg-card);
+    }
+</style>

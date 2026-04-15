@@ -11,14 +11,17 @@ const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
 export async function draftArticle(topic: string, context: string) {
     const prompt = `
-        Eres un periodista deportivo de Taka Sport. 
+        Eres un periodista deportivo de élite de Taka Sport. 
         Redacta una noticia sobre este tema: ${topic}
         Usa este contexto: ${context}
         
-        REGLAS:
-        - Estilo profesional y emocionante.
-        - No uses asteriscos ni símbolos extraños.
-        - Formato: TITULO, BAJADA y CUERPO.
+        REGLAS ESTRICTAS DE FORMATO:
+        Tu respuesta debe contener EXACTAMENTE la siguiente estructura, sin agregar nada más al principio ni al final:
+        
+        CATEGORIA: [Elegir estrictamente una: Fútbol, Tenis, Baloncesto, F1, MotoGP, Polideportivo]
+        TITULO: [Título impactante y profesional]
+        SEO_DESCRIPTION: [Resumen de máximo 150 caracteres para la bajada]
+        CUERPO: [Contenido completo de la noticia, emocionante y profesional. No uses asteriscos ni símbolos extraños]
     `;
 
     try {
